@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>toolbar testing</title>
+<script src=toolbar.js></script>
+<style>
+	body {
+		display: flex;
+		flex-direction: column;
+		margin: 0;
+		height: 95vh;
+	}
+	textarea {
+		flex: auto;
+	}
+	#hebrewkeyboard button {
+		font-family: serif;
+	}
+	[role=toolbar]{
+		counter-reset: buttoncounter;
+		margin: 2px 10px;
+	}
+	[role=toolbar] button {
+		font-size: 18px;
+		height: 1.3em;
+		position: relative;
+		padding: 1px 4px 14px;
+		min-width: 1.5em;
+		vertical-align: bottom;
+		counter-increment: buttoncounter;
+	}
+	[role=toolbar] button::before {
+	    content: attr(name);
+		position: relative;
+		bottom: 0.1em;
+	}
+	[role=toolbar].active button::after {
+		content: counter(buttoncounter, upper-alpha);
+		position: absolute;
+		opacity: 30%;
+		z-index: 1;
+		bottom: -1.2em;
+		right: 0.25em;
+		font-size: 20px;
+		font-family: sans-serif;
+		font-style: normal;
+		color: black;
+		font-weight: bold;
+	}
+	[role=toolbar] button.highlight, [role=toolbar] button[aria-pressed] {
+		background: linear-gradient(ThreeDHighlight, ThreeDHighlight, ButtonFace);
+		border: 2px inset buttonface;
+		border-radius: 4px;
+	}
+	button.reverse\~words::before {
+		content: '↔️';
+	}
+	button.pig\~latin::before {
+		content: '🐖';
+		bottom: 0.4em
+	}
+	button.a , button.ק , button.ז {
+		margin-left: 0.5em;
+	}
+	button.z , button.ש{
+		margin-left: 1em;
+	}
+</style>
+</head>
+<body>
+<div id=hebrewkeyboard style=display:none ></div>
+<div id=keyboard style=display:none ></div>
+<div id=toolbar><button name='nothing'></button></div>
+<textarea></textarea>
+<input />
+<script>
+
+function toggle (el){
+	if (window.getComputedStyle(el).display == 'none'){
+		el.style.display = 'block';
+	}else{
+		el.style.display = 'none';
+	}
+}
+function reversewords (text){
+	return text.split('\n').map(function(s){
+		return s.split(/\s+/).reverse().join(' ');
+	}).join('\n');
+};
+
+function piglatin (text){
+	return text.replace(/([bcdfghjklmnpqrstvwxyz]*)([aeiou])([a-z]*)/ig,
+	 (_, p1, p2, p3) => p2 + p3 + ( p1 ? p1 + 'ay' : 'way'))
+}
+
+
+function run (command){
+	if (command == 'reverse') {
+		this.value = reversewords(this.value);
+	}else if (command == 'anslatetray'){
+		this.value = piglatin(this.value);
+	}else if (command == 'nothing'){
+		console.log('Nothing happens');
+	}else if (command == 'kbd'){
+		toggle(document.querySelector('#keyboard'));
+	}else if (command == 'hkbd'){
+		toggle(document.querySelector('#hebrewkeyboard'));
+	}else{
+		this.value = this.value + command;
+	}
+	document.querySelector('textarea').focus();
+}
+
+function type (command){
+	const before = this.value.substring(0,this.selectionStart);
+	const after = this.value.substring(this.selectionEnd);
+	this.value = before + command + after;
+	this.setSelectionRange (before.length + command.length, before.length + command.length);
+	document.querySelector('textarea').focus();
+}
+
+const t = new Toolbar (document.querySelector('#toolbar'), document.querySelector('textarea'), run, 'toolbar');
+t.button('reverse~words', 'reverse', 'Reverse Words in Selection');
+t.button('Ping', ' ping!');
+t.button('nothing', 'nothing');
+t.button('pig~latin', 'anslatetray', 'Translate to Pig Latin');
+t.button(' foo');
+t.togglebutton('⌨️', 'kbd', 'Toggle Virtual Keyboard');
+t.togglebutton('⌨️~he', 'hkbd', 'Toggle Virtual Hebrew Keyboard');
+
+const k = new Toolbar(document.querySelector('#keyboard'), document.querySelector('textarea'), type, 'English keyboard');
+k.buttons('qwertyiop'.split('').map( x => [x] ));
+k.element('<br>');
+k.buttons('asdfghjkl;'.split('').map( x => [x] ));
+k.element('<br>');
+k.buttons('zxcvbnm,.'.split('').map( x => [x] ));
+
+
+// getting the Hebrew diacritics to display correctly and be editable in Notepad++ is painful. 
+const hk = new Toolbar (document.querySelector('#hebrewkeyboard'), document.querySelector('textarea'), type, 'Hebrew Keyboard');
+const nikudnames = 'ששְׁוָא חֲטַף־סֶגּוֹל חֲטַף־פַּתַח חֲטַף־קָמָץ חִירִיק צֵירֵי סֶגּוֹל פַּתַח קָמַץ Sin־dot Shin־dot חוֹלָם דָּגֵשׁ קֻבּוּץ קָמַץ־קָטָן'.split(' ');
+hk.buttons('שְ שֱ שֲ שֳ שִ שֵ שֶ שַ שָ שׂ שׁ וֹ שּ שֻ שׇ'.split(' ').map( (x, i) => [x, x[1], nikudnames[i]])); // can't seem to get the unicode dotted-circle to display consistently; use a shin instead
+hk.element('<br>');
+const taamnames = 'מֻנַּ֣ח זַרְקָא֮ סֶגּוֹל֒ רְבִ֗יע מַהְפַּ֤ך פַּשְׁטָא֙ זָקֵף־קָטָ֔ן זָקֵף־גָּד֕וֹל מֵרְכָ֥א טִפְּחָ֖א אֶתְנַחְתָּ֑א פָּזֵ֡ר תְּלִישָא־קְטַנָּה֩ תְּ֠לִישָא־גְדוֹלָה קַדְמָ֨א וְאַזְלָ֜א אַזְלָא־גֵּ֜רֵשׁ גֵּרְשַׁ֞יִם ד' + 
+ 'ַּרְגָּ֧א תְּבִ֛יר יְ֚תִיב פְּסִיק׀ סוֹף־פָּסֽוּק׃ שַׁלְשֶׁ֓לֶת מֵרְכָא־כְּפוּלָ֦ה יֵרֶח־בֶּן־יוֹמ֪וֹ קַרְנֵי־פָרָ֟ה גֵּרֵשׁ־מֻקְדָּם֝ אתנח־הפוך֢ עוֹלֶה֫ עִלּוּי֬ דחי֭ צִנּוֹרִת֘';
+const taamim = taamnames.replace(/[ קראטוןםפשדגכעיחלךףזסבהנמצתץשְשֱשֲשֳשִשֵשֶשַשָשׂשׁוֹשּשֻ־סֽ]/g, '').split(''); // strip everything that isn't a taam
+hk.buttons(taamim.map ( (x,i) => ['ש' + x, x, taamnames.split(' ')[i]] ));
+hk.element('<br>');
+hk.buttons([['₪'], ['שֽ','שֽ'[1], 'מתג'], ['שׄ', 'שׄ'[1], 'Upper Dot'], ['שׅ','שׅׅ'[1],'Lower Dot'], ['׆'], ['־'], ['שֿ', 'שֿֿ'[1], 'רפה'], ['״'], ['׳'], ['ײ'], ['ױ'], ['װ']]);
+hk.element('<br>');hk.buttons('קראטוןםפ'.split('').map( x => [x] ));
+hk.element('<br>');
+hk.buttons('שדגכעיחלךף'.split('').map( x => [x] ));
+hk.element('<br>');
+hk.buttons('זסבהנמצתץ'.split('').map( x => [x] ));
+
+
+</script>
+</body>
+</html>
