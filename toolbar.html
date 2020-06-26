@@ -16,11 +16,11 @@
 	#hebrewkeyboard button {
 		font-family: serif;
 	}
-	[role=toolbar]{
+	[role="toolbar"]{
 		counter-reset: buttoncounter;
 		margin: 2px 10px;
 	}
-	[role=toolbar] button {
+	[role="toolbar"] button {
 		font-size: 18px;
 		height: 1.3em;
 		position: relative;
@@ -28,28 +28,35 @@
 		min-width: 1.5em;
 		vertical-align: bottom;
 		counter-increment: buttoncounter;
+		outline: none; /* we will use the highlighting below to indicate focus */
 	}
-	[role=toolbar] button::before {
-	    content: attr(name);
+	[role="toolbar"] button::before {
+	  content: attr(name);
 		position: relative;
 		bottom: 0.1em;
 	}
-	[role=toolbar].active button::after {
+	[role="toolbar"].capturing-menu:focus-within:not(:active) button::after {
 		content: counter(buttoncounter, upper-alpha);
 		position: absolute;
-		opacity: 30%;
+		opacity: 20%;
 		z-index: 1;
-		bottom: -1.2em;
-		right: 0.25em;
-		font-size: 20px;
+		top: -0.3em;
+		left: 0;
+		width: 100%;
+		font-size: 200%;
 		font-family: sans-serif;
 		font-style: normal;
 		color: black;
 		font-weight: bold;
 	}
-	[role=toolbar] button.highlight, [role=toolbar] button[aria-pressed] {
+	[role="toolbar"] button.highlight , [role="toolbar"] button[aria-pressed="true"]{
 		background: linear-gradient(ThreeDHighlight, ThreeDHighlight, ButtonFace);
 		border: 2px inset buttonface;
+		border-radius: 4px;
+	}
+	[role="toolbar"] button:focus {
+		background: linear-gradient(ThreeDHighlight, ThreeDHighlight, ButtonFace);
+		border: 2px inset black;
 		border-radius: 4px;
 	}
 	button.reverse\~words::before {
@@ -59,11 +66,14 @@
 		content: '🐖';
 		bottom: 0.4em
 	}
-	button.a , button.ק , button.ז {
+	button.a , button.ש {
 		margin-left: 0.5em;
 	}
-	button.z , button.ש{
+	button.z , button.ז {
 		margin-left: 1em;
+	}
+	button.ק {
+		margin-left: 1.5em;
 	}
 </style>
 </head>
@@ -106,7 +116,7 @@ function run (command){
 	}else if (command == 'hkbd'){
 		toggle(document.querySelector('#hebrewkeyboard'));
 	}else{
-		this.value = this.value + command;
+		this.value += command;
 	}
 	document.querySelector('textarea').focus();
 }

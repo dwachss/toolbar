@@ -14,16 +14,17 @@ function Toolbar (container, target, func, label){
 	let otherToolbar = document.querySelector(`[aria-controls=${id}]`);
 	container.setAttribute('aria-controls', id);
 	// only have one toolbar capturing the context menu
-	if (!otherToolbar) target.addEventListener('contextmenu', evt => {
-		if (evt.button == 0){ // ony capture the menu key, not the right-click
-			if ( container.children.length == 0 ) return;
-			container.classList.add('active');
-			container.querySelector('[tabindex="0"]').focus();
-			evt.preventDefault();
-			return false;
-		}
-	});
-	container.addEventListener('focusout', ()=> container.classList.remove('active'));
+	if (!otherToolbar){
+		target.addEventListener('contextmenu', evt => {
+			if (evt.button == 0){ // ony capture the menu key, not the right-click
+				if ( container.children.length == 0 ) return;
+				container.querySelector('[tabindex="0"]').focus();
+				evt.preventDefault();
+				return false;
+			}
+		});
+		container.classList.add('capturing-menu');
+	}
 	container.addEventListener('keyup', evt => {
 		if (evt.key == 'Escape') target.focus();
 		if (/^Key[A-Z]$/.test(evt.code)){
@@ -71,17 +72,24 @@ Toolbar.prototype = {
 		let focusedButton = this._container.querySelector('[tabindex="0"]');
 		button.setAttribute('tabindex', focusedButton ? -1 : 0 ); // roving tab index. https://www.w3.org/TR/wai-aria-practices/#kbd_roving_tabindex
 		button.addEventListener ('click', evt => {
+			this._container.querySelector('[tabindex="0"]').setAttribute('tabindex', -1);
+			button.setAttribute ('tabindex', 0);
 			this._func(button.getAttribute('data-command'));
 		});
 		return button;
 	},
 	togglebutton(){
-		this.button(...arguments).addEventListener('click', evt => evt.target.toggleAttribute('aria-pressed'));
+		this.button(...arguments).addEventListener('click', 
+		 evt => evt.target.ariaPressed = evt.target.ariaPressed == 'true' ? 'false' : 'true');
 	},
 	buttons (buttons){
 		buttons.forEach(button => this.button(...button));
 	},
-	element (html) {
-		this._container.insertAdjacentHTML('beforeend', html);	
+	element (el) {
+		if (el.nodeType){
+			this._container.appendChild(el);
+		}else{
+			this._container.insertAdjacentHTML('beforeend', el);
+		}
 	}
 };
