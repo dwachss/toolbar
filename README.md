@@ -77,3 +77,53 @@ Convenience method to append a number of buttons. Calls `t.button` with each ele
 buttons.forEach(button => this.button(...button));
 ````
 
+## Styling
+
+The buttons have no content; they are meant to have content added with `::before` pseudo-elements, like:
+````css
+[role="toolbar"] button::before {
+  content: attr(name);
+}
+````
+labels each button with its name. Since the name is also used as the class, it is easy to customize:
+````css
+[role="toolbar"] button.swap::before {
+  content: 'Switcheroo';
+}
+````
+
+or use emojis or [FontAwesome](https://fontawesome.com/) as content.
+
+Buttons that are clicked with the letter shortcut get the `highlight` class for 400 milliseconds, and toggle buttons should indicate that they are pressed. This works:
+````css
+	[role="toolbar"] button.highlight, [role=toolbar] button[aria-pressed="true"] {
+		background: linear-gradient(ThreeDHighlight, ThreeDHighlight, ButtonFace);
+		border: 2px inset buttonface;
+		border-radius: 4px;
+	}
+````
+
+The toolbar that is capturing the Menu key gets a class `capturing-menu`. This allows me to make a sort of tooltip to help with the letter shortcuts:
+````css
+	[role="toolbar"]{
+		counter-reset: buttoncounter;
+	}
+
+/* complicated selector. I want the button::after element to be a letter (the content = counter(...upper-alpha)
+   and that displayed overlying the button (position: absolute, width: 100%, left: 0) but very translucent (opacity: 20%).
+   But I only want them displayed on the context-menu capturing toolbar, since that's where I would want to use a keyboard-only shortcut,
+   and only when the button is focused but not from the mouse: that's :focus-within:not(:active) */
+	[role="toolbar"].capturing-menu:focus-within:not(:active) button::after {
+		content: counter(buttoncounter, upper-alpha);
+		position: absolute;
+		opacity: 20%;
+		z-index: 1;
+		top: -0.3em;
+		left: 0;
+		width: 100%;
+		font-size: 200%;
+		font-family: sans-serif;
+		font-style: normal;
+		color: black;
+		font-weight: bold;
+	}
