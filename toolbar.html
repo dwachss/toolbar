@@ -73,6 +73,33 @@
 	button.ק {
 		margin-left: 1.5em;
 	}
+	button.cursive { font-family: cursive }
+	button.fantasy { font-family: fantasy }
+	button.monospace { font-family: monospace }
+	button.sans-serif { font-family: sans-serif }
+	button.serif { font-family: serif }
+	button.toggledirection::before {
+		content: '➡️';
+	}
+	button.toggledirection.rtl::before {
+		content: '⬅️';
+	}
+	span.light {
+		width: 1em;
+		display: inline-block;
+		height: 1em;
+		border-radius: 50%;
+		box-sizing: border-box;
+		background: grey;
+		margin: 0 5px;
+		position: relative;
+		top: 0.2em;
+		border: 3px solid white;
+	}
+	span.light.on {
+		background: green;
+		border: 2px solid yellow;
+	}
 </style>
 </head>
 <div id=keyboard style=display:none ></div>
@@ -81,27 +108,47 @@
 <script>
 
 
-function reversewords (text){
-	return text.split('\n').map(function(s){
-		return s.split(/\s+/).reverse().join(' ');
-	}).join('\n');
-};
+const commands = {
+	donothing (){
+		console.log('Nothing happens.');
+	},
+	
+	reverse (){
+		this.value = this.value.split('\n').map(function(s){
+			return s.split(/[ ]+/).reverse().join(' ');
+		}).join('\n');
+	},
 
-function piglatin (text){
-	return text.replace(/([bcdfghjklmnpqrstvwxyz]*)([aeiou])([a-z]*)/ig,
-	 (_, p1, p2, p3) => p2 + p3 + ( p1 ? p1 + 'ay' : 'way'))
+	anslatetray (){
+		this.value = this.value.replace(/([bcdfghjklmnpqrstvwxyz]*)([aeiou])([a-z]*)/ig,
+		 (_, p1, p2, p3) => p2 + p3 + ( p1 ? p1 + 'ay' : 'way'))
+	},
+
+	kbd(){
+		toggleAttribute(document.querySelector('#keyboard'),'style.display', ['block','none']);
+	},
+	
+	randomizeFont (){
+		const font = ['cursive','fantasy','monospace','sans-serif','serif'][Math.floor(Math.random() * 5)];
+		this.style.fontFamily = font;
+	},
+	
+	underline (){
+		toggleAttribute(this, 'style.textDecorationLine', ['underline', 'none']);
+	},
+	
+	toggledirection (){
+		toggleAttribute(this, 'dir', ['rtl', 'ltr']);		
+	},
+	
+	greenlight (){
+		toggleAttribute(this, 'data-green-light', ['on', 'off']);		
+	}
 }
 
-
 function run (command){
-	if (command == 'reverse') {
-		this.value = reversewords(this.value);
-	}else if (command == 'anslatetray'){
-		this.value = piglatin(this.value);
-	}else if (command == 'nothing'){
-		console.log('Nothing happens');
-	}else if (command == 'kbd'){
-		toggleAttribute(document.querySelector('#keyboard'),'style.display', ['block','none']);
+	if (commands[command]) {
+		commands[command].call(this);
 	}else{
 		this.value += command;
 	}
@@ -119,10 +166,15 @@ function type (command){
 const t = new Toolbar (document.querySelector('#toolbar'), document.querySelector('textarea'), run, 'toolbar');
 t.button('reverse~words', 'reverse', 'Reverse Words in Selection');
 t.button('Ping', ' ping!');
-t.button('nothing', 'nothing');
+t.button('nothing', 'donothing');
 t.button('pig~latin', 'anslatetray', 'Translate to Pig Latin');
 t.button(' foo');
-t.togglebutton('⌨️', 'kbd', 'Toggle Virtual Keyboard');
+t.toggleButton('⌨️', 'kbd', 'Toggle Virtual Keyboard');
+t.observerButton('Random Font', 'randomizeFont', 'style.fontFamily', 'Change Font Randomly');
+t.toggleButton ('underline');
+t.observerButton ('toggledirection', undefined, 'dir', 'Toggle Text Direction');
+t.button ('Green Light', 'greenlight', 'Turn on the Green Light');
+t.observerElement('<span class=light>', 'data-green-light');
 
 const k = new Toolbar(document.querySelector('#keyboard'), document.querySelector('textarea'), type, 'English keyboard');
 k.buttons('qwertyiop'.split('').map( x => [x] ));

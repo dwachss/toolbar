@@ -1,7 +1,6 @@
 function toggleAttribute (el, attr, states){
 	if (/^style\./.test(attr)){
-		console.log(el);
-		attr = attr.slice(6);
+		attr = attr.slice(6).replace (/-[a-z]/g, x => x.toUpperCase() ); // make sure it's camel case
 		el.style[attr] = window.getComputedStyle(el)[attr] == states[0] ? states[1] : states[0];
 	}else{
 		el.setAttribute(attr, el.getAttribute(attr) == states[0] ? states[1] : states[0]);
@@ -76,7 +75,7 @@ Toolbar.prototype = {
 			button = this._container.lastChild;
 		}
 		button.setAttribute('name', name);
-		button.classList.add(name.trim());
+		button.classList.add(name.replace(/\s/g,''));
 		if (title) button.setAttribute('title', title);
 		button.setAttribute('data-command', command);
 		let focusedButton = this._container.querySelector('[tabindex="0"]');
@@ -88,10 +87,13 @@ Toolbar.prototype = {
 		});
 		return button;
 	},
-	togglebutton(){
+	toggleButton(){
 		this.button(...arguments).addEventListener('click', 
 			evt => toggleAttribute (evt.target, 'aria-pressed', ['true', 'false'])
 		);
+	},
+	observerButton (name, command = name, attr, title){
+		this.observerElement (this.button(name, command, title), attr);
 	},
 	buttons (buttons){
 		buttons.forEach(button => this.button(...button));
@@ -101,6 +103,40 @@ Toolbar.prototype = {
 			this._container.appendChild(el);
 		}else{
 			this._container.insertAdjacentHTML('beforeend', el);
+			el = this._container.lastChild;
 		}
+		return el;
+	},
+	observerElement (el, attr){
+		console.log(el, attr);
+		el = this.element(el);
+		let styleRE = undefined;
+		if (/^style\./.test(attr)){
+			// keeping track of what needs camel case and what needs snake case is hard!
+			attr = attr.slice(6).replace (/-[a-z]/g, x => x.toUpperCase() );
+			// the existence of styleRE is a flag that we are looking for styles.
+			styleRE = new RegExp (`${attr.replace (/[A-Z]/g, x => '-' + x.toLowerCase() )}:\\s*([^;]+)\\s*;`);
+		}
+		const observer = new MutationObserver( mutations => {
+			mutations.forEach ( mutation => {
+				let newValue = mutation.target.getAttribute(attr);
+				if (styleRE) newValue = mutation.target.style[attr];
+				let oldValue = mutation.oldValue;
+				if (styleRE) {
+					oldValue = styleRE.exec(mutation.oldValue);
+					if (oldValue) oldValue = oldValue[1];
+				}
+				// if we are observing 'style', then *any* change to inline styles will trigger this.
+				// we only want to do anything if *our* CSS property changed.
+				if (newValue == oldValue) return;
+				el.classList.remove (oldValue);
+				if (newValue) el.classList.add (newValue);
+				console.log(el);
+			})
+		});
+		observer.observe (
+			document.querySelector(`#${this._container.getAttribute('aria-controls')}`),
+			{ attribute: true, attributeOldValue: true, attributeFilter: [ styleRE ? 'style' : attr ] }		
+		);	
 	}
 };
