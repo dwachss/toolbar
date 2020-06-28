@@ -1,3 +1,12 @@
+function toggleAttribute (el, attr, states){
+	if (/$style\./.test(attr)){
+		attr = attr.slice(6);
+		el.styles[attr] = window.getComputedStyle(el)[attr] == states[0] ? states[1] : states[0];
+	}else{
+		el.setAttribute(attr, el.getAttribute(attr) == states[0] ? states[1] : states[0]);
+	}
+}
+
 
 function Toolbar (container, target, func, label){
 	this._container = container;
@@ -80,7 +89,8 @@ Toolbar.prototype = {
 	},
 	togglebutton(){
 		this.button(...arguments).addEventListener('click', 
-		 evt => evt.target.ariaPressed = evt.target.ariaPressed == 'true' ? 'false' : 'true');
+			evt => toggleAttribute (evt.target, 'aria-pressed', ['true', 'false'])
+		);
 	},
 	buttons (buttons){
 		buttons.forEach(button => this.button(...button));
