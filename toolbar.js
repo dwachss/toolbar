@@ -1,7 +1,8 @@
 function toggleAttribute (el, attr, states){
-	if (/$style\./.test(attr)){
+	if (/^style\./.test(attr)){
+		console.log(el);
 		attr = attr.slice(6);
-		el.styles[attr] = window.getComputedStyle(el)[attr] == states[0] ? states[1] : states[0];
+		el.style[attr] = window.getComputedStyle(el)[attr] == states[0] ? states[1] : states[0];
 	}else{
 		el.setAttribute(attr, el.getAttribute(attr) == states[0] ? states[1] : states[0]);
 	}
