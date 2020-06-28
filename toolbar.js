@@ -1,13 +1,3 @@
-function toggleAttribute (el, attr, states){
-	if (/^style\./.test(attr)){
-		attr = attr.slice(6).replace (/-[a-z]/g, x => x.toUpperCase() ); // make sure it's camel case
-		el.style[attr] = window.getComputedStyle(el)[attr] == states[0] ? states[1] : states[0];
-	}else{
-		el.setAttribute(attr, el.getAttribute(attr) == states[0] ? states[1] : states[0]);
-	}
-}
-
-
 function Toolbar (container, target, func, label){
 	this._container = container;
 	this._func = func.bind(target);
@@ -67,6 +57,15 @@ function Toolbar (container, target, func, label){
 	});
 }
 
+Toolbar.toggleAttribute = function (el, attr, states){
+	if (/^style\./.test(attr)){
+		attr = attr.slice(6).replace (/-[a-z]/g, x => x.toUpperCase() ); // make sure it's camel case
+		el.style[attr] = window.getComputedStyle(el)[attr] == states[0] ? states[1] : states[0];
+	}else{
+		el.setAttribute(attr, el.getAttribute(attr) == states[0] ? states[1] : states[0]);
+	}
+};
+
 Toolbar.prototype = {
 	button(name, command = name, title) {
 		let button = this._container.querySelector(`button[name=${JSON.stringify(name)}]`);
@@ -88,15 +87,17 @@ Toolbar.prototype = {
 		return button;
 	},
 	toggleButton(){
-		this.button(...arguments).addEventListener('click', 
-			evt => toggleAttribute (evt.target, 'aria-pressed', ['true', 'false'])
+		const button = this.button(...arguments);
+		button.addEventListener('click', 
+			evt => Toolbar.toggleAttribute (evt.target, 'aria-pressed', ['true', 'false'])
 		);
+		return button;
 	},
 	observerButton (name, command = name, attr, title){
-		this.observerElement (this.button(name, command, title), attr);
+		return this.observerElement (this.button(name, command, title), attr);
 	},
 	buttons (buttons){
-		buttons.forEach(button => this.button(...button));
+		return buttons.forEach(button => this.button(...button));
 	},
 	element (el) {
 		if (el.nodeType){
@@ -130,9 +131,9 @@ Toolbar.prototype = {
 				// we only want to do anything if *our* CSS property changed.
 				if (newValue == oldValue) return;
 				el.classList.remove (oldValue);
-				if (newValue) el.classList.add (newValue);
-				console.log(el);
+				if (newValue) el.classList.add (newValue.replace(/\s/g,''));
 			})
+			return el;
 		});
 		observer.observe (
 			document.querySelector(`#${this._container.getAttribute('aria-controls')}`),

@@ -125,7 +125,7 @@ const commands = {
 	},
 
 	kbd(){
-		toggleAttribute(document.querySelector('#keyboard'),'style.display', ['block','none']);
+		Toolbar.toggleAttribute(document.querySelector('#keyboard'),'style.display', ['block','none']);
 	},
 	
 	randomizeFont (){
@@ -134,15 +134,15 @@ const commands = {
 	},
 	
 	underline (){
-		toggleAttribute(this, 'style.textDecorationLine', ['underline', 'none']);
+		Toolbar.toggleAttribute(this, 'style.textDecorationLine', ['underline', 'none']);
 	},
 	
 	toggledirection (){
-		toggleAttribute(this, 'dir', ['rtl', 'ltr']);		
+		Toolbar.toggleAttribute(this, 'dir', ['rtl', 'ltr']);		
 	},
 	
 	greenlight (){
-		toggleAttribute(this, 'data-green-light', ['on', 'off']);		
+		Toolbar.toggleAttribute(this, 'data-green-light', ['on', 'off']);		
 	}
 }
 
