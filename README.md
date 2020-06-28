@@ -5,7 +5,10 @@ Javascript abstraction of a toolbar, that tries to emulate the behavior of the [
 ## Files
 
 toolbar.js: the code. No dependencies, but assumes a modern browser (tested on Edge (the Chromium version), Chrome and Firefox).
+
 [toolbar.html](http://dwachss.github.io/toolbar/toolbar.html): simple demo.
+
+[toolbar2.html](http://dwachss.github.io/toolbar/toolbar2.html): Another simple demo that includes a Hebrew onscreen keyboard.
 
 ## Usage
 
@@ -29,6 +32,18 @@ t.button('bar');
 
 ## Code
 
+### `Toolbar.toggleAttribute` function
+
+Convenience function to change and attribute or style property between two values.
+
+````js
+Toolbar.toggleAttribute (el: Element, attr: string, states: [state0: string, state1: string]);
+````
+
+If the value of the attribute `el[attr]` is `state0` then it is changed to state1. Otherwise, change it to `state1`. To set style properties, use `"style.property"` for `attr` (either [camelCase](https://en.wikipedia.org/wiki/Camel_case) or [kebab-case](https://en.wikipedia.org/wiki/Kebab_case) are fine).
+
+so `Toolbar.toggleAttribute(el, 'style.display', ['block', 'none'])` will alternately show and hide the element. `Toolbar.toggleAttribute(el, 'spellcheck', ['true', 'false'])` will toggle spellchecking.
+
 ### Constructor
 
 ````js
@@ -48,15 +63,19 @@ The `contextmenu` event is captured on `target`, when that event is triggered by
 t.button(name: string, command: string, title: string);
 ````
 
-Appends a new `button` element, as `<button name=${name} class=${name} data-command=${command} title=${title} tabindex=-1></button>`. If `command` is undefined, it is set to `name`. If `title` is undefined it is omitted. (The tabindex is set to `0` when the button is clicked, which marks it as active when the user tabs into the toolbar). Clicking the button runs `func(command)` as described above.
+Appends a new `button` element, as `<button name=${name} class=${name} data-command=${command} title=${title} tabindex=-1></button>`. (The `name` used as a class name has all spaces removed; otherwise it would be an illegal class name). If `command` is undefined, it is set to `name`. If `title` is undefined it is omitted. (The tabindex is set to `0` when the button is clicked, which marks it as active when the user tabs into the toolbar). Clicking the button runs `func(command)` as described above.
 
-### `togglebutton` method
+Returns the `button` element created.
+
+### `toggleButton` method
 
 ````js
-t.togglebutton(name: string, command: string, title: string);
+t.toggleButton(name: string, command: string, title: string);
 ````
 
 Creates a button exactly like `button` but adds a `click` listener that toggles the `aria-pressed` attribute between `true` and `false` (note that the standard uses those words, rather than toggling the attribute itself).
+
+Returns the `button` element created.
 
 ### `element` method
 
@@ -65,6 +84,30 @@ t.element(el: Element or string);
 ````
 
 Simply appends `el` (as the element or as HTML) to the end of the toolbar. To have the element respond to arrow keys and tabs correctly, make sure it has `tabindex=-1`. `t.element('<br>`) is a convenient way to have the toolbar span two lines.
+
+Returns the element appended.
+
+### `observerElement` method
+
+````js
+t.observerElement (el: Element or string, attr: string);
+````
+
+Appends `el` with `element` above, then sets up a [MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) on the `target` element of the toolbar, responding to changes in the `attr` attribute of that element. When a change happens, the new *value* of the attribute is added as a *class* of the element. The old value is removed. Use CSS to change the appearance of the element.
+
+For example, if your editor sets the value of the attribute `"data-write-state"` to `"dirty"` when the text has changed, `"clean"` when the new text is saved, and `"pending"` while it is being saved, then `t.observerElement('<span id=writeindicator >', 'data-write-state')` will set the class of `span#writeindicator` to `dirty`, `clean`, or `pending` as soon as the attribute changes.
+
+Changes in styles (only inline styles, set with `element.style.property`) can be observed as well, with `style.property`. The property can be in [camelCase](https://en.wikipedia.org/wiki/Camel_case) or [kebab-case](https://en.wikipedia.org/wiki/Kebab_case). So to monitor the font family, use `t.observerElement(el, 'style.fontFamily')`. Values will have spaces removed before using them as class names.
+
+Returns the element appended.
+
+### `observerButton` method
+
+````js
+t.observerButton(name: string, command: string, attr: string, title: string);
+````
+
+Combines `button` and `observerElement`. Simplly returns `t.observerElement(t.button (name, command, string), attr)`.
 
 ### `buttons` method
 
@@ -76,6 +119,8 @@ Convenience method to append a number of buttons. Calls `t.button` with each ele
 ````js
 buttons.forEach(button => this.button(...button));
 ````
+
+Returns an array of the `button` elements created.
 
 ## Styling
 
@@ -127,3 +172,4 @@ The toolbar that is capturing the Menu key gets a class `capturing-menu`. This a
 		color: black;
 		font-weight: bold;
 	}
+````
