@@ -82,7 +82,7 @@
 <div id=hebrewkeyboard style=display:none ></div>
 <div id=keyboard style=display:none ></div>
 <div id=toolbar><button name='nothing'></button></div>
-<textarea></textarea>
+<textarea spellcheck=false></textarea>
 <input />
 <script>
 
@@ -116,6 +116,8 @@ function run (command){
 		toggle(document.querySelector('#keyboard'));
 	}else if (command == 'hkbd'){
 		toggle(document.querySelector('#hebrewkeyboard'));
+	}else if (command == 'Spellcheck'){
+		Toolbar.toggleAttribute (this, 'spellcheck', ['true','false']);
 	}else{
 		this.value += command;
 	}
@@ -136,8 +138,9 @@ t.button('Ping', ' ping!');
 t.button('nothing', 'nothing');
 t.button('pig~latin', 'anslatetray', 'Translate to Pig Latin');
 t.button(' foo');
-t.togglebutton('⌨️', 'kbd', 'Toggle Virtual Keyboard');
-t.togglebutton('⌨️~he', 'hkbd', 'Toggle Virtual Hebrew Keyboard');
+t.toggleButton('⌨️', 'kbd', 'Toggle Virtual Keyboard');
+t.toggleButton('⌨️~he', 'hkbd', 'Toggle Virtual Hebrew Keyboard');
+t.toggleButton('Spellcheck');
 
 const k = new Toolbar(document.querySelector('#keyboard'), document.querySelector('textarea'), type, 'English keyboard');
 k.buttons('qwertyiop'.split('').map( x => [x] ));
