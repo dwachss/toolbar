@@ -14,6 +14,7 @@
 	textarea {
 		flex: auto;
 		font-size: 18px;
+		animation: spin 2s 0 linear; /* for playing with animation */
 	}
 	#hebrewkeyboard button {
 		font-family: serif;
@@ -36,6 +37,13 @@
 		position: relative;
 		bottom: 0.1em;
 	}
+	[role="toolbar"] button::after {
+		position: absolute;
+		right: 0;
+		width: 100%;
+		text-align: center;
+		bottom: 0.1em;
+	}
 	[role="toolbar"].capturing-menu:focus-within:not(:active) button::after {
 		content: counter(buttoncounter, upper-alpha);
 		position: absolute;
@@ -44,11 +52,12 @@
 		top: -0.3em;
 		left: 0;
 		width: 100%;
-		font-size: 200%;
+		font-size: 36px;
 		font-family: sans-serif;
 		font-style: normal;
 		color: black;
 		font-weight: bold;
+		animation: none;
 	}
 	[role="toolbar"] button.highlight , [role="toolbar"] button[aria-pressed="true"]{
 		background: linear-gradient(ThreeDHighlight, ThreeDHighlight, ButtonFace);
@@ -63,9 +72,29 @@
 	button.reverse\~words::before {
 		content: '↔️';
 	}
+	button.pig\~latin {
+		font-size: 150%;
+		height: 0.5em;
+	}
+	button.rotate {
+		font-size: 120%;
+		height: 0.5em;
+	}
 	button.pig\~latin::before {
-		content: '🐖';
-		bottom: 0.4em
+		content: url('https://gitcdn.xyz/repo/hfg-gmuend/openmoji/master/color/svg/1F416.svg'); /* Pig */
+		bottom: 0.35em
+	}
+	button.rotate::before {
+		content: url('https://gitcdn.xyz/repo/hfg-gmuend/openmoji/master/color/svg/1F4BE.svg');  /* Floppy Disk */
+		bottom: 0.15em
+	}
+	button.rotate::after {
+		font-size: 83%;
+		bottom: -0.1em;
+		line-height: 0.8em;
+		color: red;
+		content: "🗘";
+		animation: spin 2s infinite linear;
 	}
 	button.a , button.ש {
 		margin-left: 0.5em;
@@ -75,6 +104,14 @@
 	}
 	button.ק {
 		margin-left: 1.5em;
+	}
+	@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(359deg);
+		}
 	}
 </style>
 </head>
@@ -118,6 +155,8 @@ function run (command){
 		toggle(document.querySelector('#hebrewkeyboard'));
 	}else if (command == 'Spellcheck'){
 		Toolbar.toggleAttribute (this, 'spellcheck', ['true','false']);
+	}else if (command == 'rotate'){
+		Toolbar.toggleAttribute (this, 'style.animationIterationCount', ['infinite','0']);
 	}else{
 		this.value += command;
 	}
@@ -141,6 +180,7 @@ t.button(' foo');
 t.toggleButton('⌨️', 'kbd', 'Toggle Virtual Keyboard');
 t.toggleButton('⌨️~he', 'hkbd', 'Toggle Virtual Hebrew Keyboard');
 t.toggleButton('Spellcheck');
+t.toggleButton('rotate');
 
 const k = new Toolbar(document.querySelector('#keyboard'), document.querySelector('textarea'), type, 'English keyboard');
 k.buttons('qwertyiop'.split('').map( x => [x] ));

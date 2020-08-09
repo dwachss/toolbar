@@ -8,7 +8,7 @@ toolbar.js: the code. No dependencies, but assumes a modern browser (tested on E
 
 [toolbar.html](http://dwachss.github.io/toolbar/toolbar.html): simple demo.
 
-[toolbar2.html](http://dwachss.github.io/toolbar/toolbar2.html): Another simple demo that includes a Hebrew onscreen keyboard.
+[toolbar2.html](http://dwachss.github.io/toolbar/toolbar2.html): Another simple demo that includes a Hebrew onscreen keyboard and some hacks with CSS.
 
 ## Usage
 
