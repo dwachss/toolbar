@@ -109,7 +109,6 @@ Toolbar.prototype = {
 		return el;
 	},
 	observerElement (el, attr){
-		console.log(el, attr);
 		el = this.element(el);
 		let styleRE = undefined;
 		if (/^style\./.test(attr)){
@@ -132,12 +131,12 @@ Toolbar.prototype = {
 				if (newValue == oldValue) return;
 				el.classList.remove (oldValue);
 				if (newValue) el.classList.add (newValue.replace(/\s/g,''));
-			})
-			return el;
+			});
 		});
 		observer.observe (
 			document.querySelector(`#${this._container.getAttribute('aria-controls')}`),
 			{ attribute: true, attributeOldValue: true, attributeFilter: [ styleRE ? 'style' : attr ] }		
-		);	
+		);
+		return el;
 	}
 };
