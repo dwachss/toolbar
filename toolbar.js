@@ -14,17 +14,22 @@ function Toolbar (container, target, func, label){
 	container.setAttribute('aria-controls', id);
 	// only have one toolbar capturing the context menu
 	if (!otherToolbar){
-		target.addEventListener('contextmenu', evt => {
-			if (evt.button == 0){ // ony capture the menu key, not the right-click
+		target.addEventListener('keyup', evt => {
+			if (evt.key == 'ContextMenu'){
 				if ( container.children.length == 0 ) return;
 				container.querySelector('[tabindex="0"]').focus();
 				evt.preventDefault();
 				return false;
 			}
 		});
+		container.addEventListener('contextmenu', evt => {
+			// Firefox fires the context menu on the *container* when focused with the event listener above.
+			// Just disable the keyboard menu button (right-click works fine)
+			if (evt.button == 0) evt.preventDefault();
+		});
 		container.classList.add('capturing-menu');
 	}
-	container.addEventListener('keyup', evt => {
+	container.addEventListener('keydown', evt => {
 		if (evt.key == 'Escape') target.focus();
 		if (/^Key[A-Z]$/.test(evt.code)){
 			const index = evt.code.charCodeAt(3) - 'A'.charCodeAt(0) + 1;
@@ -54,6 +59,9 @@ function Toolbar (container, target, func, label){
 			tabbables[i].setAttribute ('tabindex', 0);
 			tabbables[i].focus();
 		}
+		// Firefox wants to insert the key into the *target*
+		// So any printable character (length == 1) is to be ignored.
+		if (evt.key.length == 1) evt.preventDefault(); 
 	});
 }
 
