@@ -32,6 +32,10 @@ t.button('bar');
 
 ## Code
 
+### `Toolbar.for(element: Element)` function
+
+Returns the first toolbar that was defined for an element, or `null` if there is no such toolbar.
+
 ### `Toolbar.toggleAttribute` function
 
 Convenience function to change and attribute or style property between two values.
@@ -40,7 +44,7 @@ Convenience function to change and attribute or style property between two value
 Toolbar.toggleAttribute (el: Element, attr: string, states: [state0: string, state1: string]);
 ````
 
-If the value of the attribute `el[attr]` is `state0` then it is changed to state1. Otherwise, change it to `state1`. To set style properties, use `"style.property"` for `attr` (either [camelCase](https://en.wikipedia.org/wiki/Camel_case) or [kebab-case](https://en.wikipedia.org/wiki/Kebab_case) are fine).
+If the value of the attribute `el[attr]` is `state0` then it is changed to `state1`. Otherwise, change it to `state0`. To set style properties, use `"style.property"` for `attr` (either [camelCase](https://en.wikipedia.org/wiki/Camel_case) or [kebab-case](https://en.wikipedia.org/wiki/Kebab_case) are fine).
 
 so `Toolbar.toggleAttribute(el, 'style.display', ['block', 'none'])` will alternately show and hide the element. `Toolbar.toggleAttribute(el, 'spellcheck', ['true', 'false'])` will toggle spellchecking.
 
@@ -56,6 +60,8 @@ function that is called for each button on the toolbar; it takes one argument th
 The `aria-label` attribute of `container` is set to the `label` argument, if present. `container.role` is set to `toolbar`. `keyup` listeners are set on `container` for the left and right arrow keys, to move between buttons when the toolbar is focused with the tab key. Letters (A-Z, case insensitive) activate the buttons ("A" clicks the first button, "B" the second, etc.) The Escape key returns the focus to `target`. `tabindex` is set with the [roving tabindex method](https://www.w3.org/TR/wai-aria-practices/#kbd_roving_tabindex) so it is possible to tab into and out of the toolbar.
 
 The `contextmenu` event is captured on `target`, when that event is triggered by the Menu key (right clicking remains unaffected) to focus on the first toolbar that was defined on `container`. So when in the `container`, hitting the Menu key then "A" clicks the first button.
+
+The `aria-controls` attribute of `container` is set to the `id` of `target`. If `target` does not have an `id`, one is created.
 
 ### `button` method
 

@@ -57,6 +57,12 @@ function Toolbar (container, target, func, label){
 	});
 }
 
+Toolbar.for = function(el){
+	const id = el.getAttribute('id');
+	if (!id) return null;
+	return document.querySelector(`[aria-controls=${id}]`);
+}
+
 Toolbar.toggleAttribute = function (el, attr, states){
 	if (/^style\./.test(attr)){
 		attr = attr.slice(6).replace (/-[a-z]/g, x => x.toUpperCase() ); // make sure it's camel case
