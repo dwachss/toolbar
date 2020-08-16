@@ -71,13 +71,26 @@ Toolbar.for = function(el){
 	return document.querySelector(`[aria-controls=${id}]`);
 }
 
-Toolbar.toggleAttribute = function (el, attr, states){
+Toolbar.getAttribute = function (el, attr) {
 	if (/^style\./.test(attr)){
 		attr = attr.slice(6).replace (/-[a-z]/g, x => x.toUpperCase() ); // make sure it's camel case
-		el.style[attr] = window.getComputedStyle(el)[attr] == states[0] ? states[1] : states[0];
+		return el.ownerDocument.defaultView.getComputedStyle(el)[attr];
 	}else{
-		el.setAttribute(attr, el.getAttribute(attr) == states[0] ? states[1] : states[0]);
+		return el.getAttribute(attr);
 	}
+}
+
+Toolbar.setAttribute = function (el, attr, state) {
+	if (/^style\./.test(attr)){
+		attr = attr.slice(6).replace (/-[a-z]/g, x => x.toUpperCase() ); // make sure it's camel case
+		el.style[attr] = state;
+	}else{
+		el.setAttribute(attr, state);
+	}
+};
+
+Toolbar.toggleAttribute = function (el, attr, states){
+	Toolbar.setAttribute (el, attr, Toolbar.getAttribute(el, attr) == states[0] ? states[1] : states[0])
 };
 
 Toolbar.prototype = {

@@ -32,22 +32,6 @@ t.button('bar');
 
 ## Code
 
-### `Toolbar.for(element: Element)` function
-
-Returns the first toolbar that was defined for an element, or `null` if there is no such toolbar.
-
-### `Toolbar.toggleAttribute` function
-
-Convenience function to change and attribute or style property between two values.
-
-````js
-Toolbar.toggleAttribute (el: Element, attr: string, states: [state0: string, state1: string]);
-````
-
-If the value of the attribute `el[attr]` is `state0` then it is changed to `state1`. Otherwise, change it to `state0`. To set style properties, use `"style.property"` for `attr` (either [camelCase](https://en.wikipedia.org/wiki/Camel_case) or [kebab-case](https://en.wikipedia.org/wiki/Kebab_case) are fine).
-
-so `Toolbar.toggleAttribute(el, 'style.display', ['block', 'none'])` will alternately show and hide the element. `Toolbar.toggleAttribute(el, 'spellcheck', ['true', 'false'])` will toggle spellchecking.
-
 ### Constructor
 
 ````js
@@ -179,3 +163,32 @@ The toolbar that is capturing the Menu key gets a class `capturing-menu`. This a
 		font-weight: bold;
 	}
 ````
+## Other functions
+
+### `Toolbar.for(element: Element)` function
+
+Returns the first toolbar that was defined for an element, or `null` if there is no such toolbar.
+
+### `Toolbar.getAttribute (element: Element, attr: string)`
+
+Returns `element.getAttribute(attr)`, however, interprets an attribute of the form `style.property` as a CSS style
+(either [camelCase](https://en.wikipedia.org/wiki/Camel_case) or [kebab-case](https://en.wikipedia.org/wiki/Kebab_case) are fine): `Toolbar.getAttribute(element, 'style.color')`
+returns `window.getComputedStyle(element)['color']`.
+
+### `Toolbar.getAttribute (element: Element, attr: string, state: string)`
+
+Similarly, does Returns `element.setAttribute(attr, state)` with special handling of `style.property`.
+
+### `Toolbar.toggleAttribute` function
+
+Convenience function to change and attribute or style property between two values.
+
+````js
+Toolbar.toggleAttribute (el: Element, attr: string, states: [state0: string, state1: string]);
+````
+
+If the value of the attribute `el[attr]` is `state0` then it is changed to `state1`. Otherwise, change it to `state0`.
+
+
+so `Toolbar.toggleAttribute(el, 'style.display', ['block', 'none'])` will alternately show and hide the element. 
+`Toolbar.toggleAttribute(el, 'spellcheck', ['true', 'false'])` will toggle spellchecking.
