@@ -177,7 +177,7 @@ returns `window.getComputedStyle(element)['color']`.
 
 ### `Toolbar.getAttribute (element: Element, attr: string, state: string)`
 
-Similarly, does Returns `element.setAttribute(attr, state)` with special handling of `style.property`.
+Similarly, does `element.setAttribute(attr, state)` with special handling of `style.property`.
 
 ### `Toolbar.toggleAttribute` function
 
