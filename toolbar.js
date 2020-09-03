@@ -1,3 +1,5 @@
+'use strict';
+
 function Toolbar (container, target, func, label){
 	this._container = container;
 	this._func = func.bind(target);
