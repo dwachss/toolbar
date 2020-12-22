@@ -73,7 +73,7 @@ Returns the `button` element created.
 t.element(el: Element or string);
 ````
 
-Simply appends `el` (as the element or as HTML) to the end of the toolbar. To have the element respond to arrow keys and tabs correctly, make sure it has `tabindex=-1`. `t.element('<br>`) is a convenient way to have the toolbar span two lines.
+Simply appends `el` (as the element or as HTML) to the end of the toolbar. To have the element respond to arrow keys and tabs correctly, make sure it has `tabindex=-1`. `t.element('<br>')` is a convenient way to have the toolbar span two lines.
 
 Returns the element appended.
 
@@ -175,7 +175,7 @@ Returns `element.getAttribute(attr)`, however, interprets an attribute of the fo
 (either [camelCase](https://en.wikipedia.org/wiki/Camel_case) or [kebab-case](https://en.wikipedia.org/wiki/Kebab_case) are fine): `Toolbar.getAttribute(element, 'style.color')`
 returns `window.getComputedStyle(element)['color']`.
 
-### `Toolbar.getAttribute (element: Element, attr: string, state: string)`
+### `Toolbar.setAttribute (element: Element, attr: string, state: string)`
 
 Similarly, does `element.setAttribute(attr, state)` with special handling of `style.property`.
 
