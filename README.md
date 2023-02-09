@@ -97,7 +97,7 @@ Returns the element appended.
 t.observerButton(name: string, command: string, attr: string, title: string);
 ````
 
-Combines `button` and `observerElement`. Simplly returns `t.observerElement(t.button (name, command, string), attr)`.
+Combines `button` and `observerElement`. Simply returns `t.observerElement(t.button (name, command, string), attr)`.
 
 ### `buttons` method
 
