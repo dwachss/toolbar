@@ -104,7 +104,7 @@ Toolbar.prototype = {
 		}
 		button.setAttribute('name', name);
 		button.classList.add(name.replace(/\s/g,''));
-		if (title) button.setAttribute('title', title);
+		button.setAttribute('title', title ?? name);
 		button.setAttribute('data-command', command);
 		let focusedButton = this._container.querySelector('[tabindex="0"]');
 		button.setAttribute('tabindex', focusedButton ? -1 : 0 ); // roving tab index. https://www.w3.org/TR/wai-aria-practices/#kbd_roving_tabindex
